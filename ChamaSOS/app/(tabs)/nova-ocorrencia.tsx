@@ -10,6 +10,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import axios from 'axios';
 
 export default function NovaOcorrenciaScreen() {
   const theme = useTheme();
@@ -17,7 +18,6 @@ export default function NovaOcorrenciaScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const idParam = params.id;
 
-  // Estados dos campos
   const [tipo, setTipo] = useState('');
   const [bairro, setBairro] = useState('');
   const [prioridade, setPrioridade] = useState<'Baixa' | 'Média' | 'Crítica'>('Baixa');
@@ -28,7 +28,6 @@ export default function NovaOcorrenciaScreen() {
   const [descricao, setDescricao] = useState('');
   const [erro, setErro] = useState('');
 
-  // Se estiver editando, pré-preencher (pode buscar do backend depois)
   useEffect(() => {
     if (idParam) {
       setTipo('Incêndio');
@@ -63,8 +62,8 @@ export default function NovaOcorrenciaScreen() {
 
     console.log('Salvando ocorrência', ocorrenciaData);
 
-    // Aqui você chamaria a API: POST (nova) ou PUT (editar)
-    // axios.post('/ocorrencias', ocorrenciaData)
+    
+    axios.post('/ocorrencias', ocorrenciaData)
 
     router.push('./ocorrencias');
   };
