@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
 import { Card, Title, Paragraph, Button, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
@@ -18,7 +18,6 @@ export default function OcorrenciasScreen() {
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([]);
 
   useEffect(() => {
-    // Simulação fetch
     setOcorrencias([
       { id: '1', tipo: 'Incêndio', bairro: 'Boa Viagem', prioridade: 'Crítica', status: 'Ativa', horario: '07:30' },
       { id: '2', tipo: 'Resgate', bairro: 'Casa Amarela', prioridade: 'Média', status: 'Encerrada', horario: '08:15' },
@@ -38,20 +37,24 @@ export default function OcorrenciasScreen() {
             <Paragraph>Horário: {oc.horario}</Paragraph>
           </Card.Content>
           <Card.Actions>
+            {/* Navegação relativa para edição */}
             <Button
               mode="outlined"
-              onPress={() =>
-                router.push({
-                  pathname: '/(tabs)/nova-ocorrencia',
-                  params: { id: oc.id },
-                } as const)
-              }
+              onPress={() => router.push(`./nova-ocorrencia?id=${oc.id}`)}
             >
               Editar
             </Button>
           </Card.Actions>
         </Card>
       ))}
+
+      <Button
+        mode="contained"
+        style={{ marginTop: 16, backgroundColor: theme.colors.primary }}
+        onPress={() => router.push('./nova-ocorrencia')}
+      >
+        Nova Ocorrência
+      </Button>
     </ScrollView>
   );
 }

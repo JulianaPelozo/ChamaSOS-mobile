@@ -1,28 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import {
-  Card,
-  Title,
-  TextInput,
-  Button,
-  HelperText,
-  RadioButton,
-  useTheme,
-} from 'react-native-paper';
+import { Card, Title, TextInput, Button, HelperText, RadioButton, useTheme } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 
-interface Ocorrencia {
-  id?: string;
-  tipo: string;
-  bairro: string;
-  prioridade: 'Baixa' | 'Média' | 'Crítica';
-  status: 'Ativa' | 'Encerrada';
-}
-
-export default function OcorrenciaFormScreen() {
+export default function NovaOcorrenciaScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+
+  const params = useLocalSearchParams<{ id?: string }>();
+  const idParam = params.id; 
 
   const [tipo, setTipo] = useState('');
   const [bairro, setBairro] = useState('');
@@ -31,14 +17,13 @@ export default function OcorrenciaFormScreen() {
   const [erro, setErro] = useState('');
 
   useEffect(() => {
-    if (id) {
-      console.log('Editando ocorrência com ID:', id);
+    if (idParam) {
       setTipo('Incêndio');
       setBairro('Boa Viagem');
       setPrioridade('Crítica');
       setStatus('Ativa');
     }
-  }, [id]);
+  }, [idParam]);
 
   const handleSalvar = () => {
     if (!tipo || !bairro) {
@@ -46,12 +31,9 @@ export default function OcorrenciaFormScreen() {
       return;
     }
     setErro('');
+    console.log('Salvando ocorrência', { id: idParam, tipo, bairro, prioridade, status });
 
-    const ocorrencia: Ocorrencia = { id, tipo, bairro, prioridade, status };
-    console.log('Salvando ocorrência:', ocorrencia);
-
-    // TODO: POST ou PUT no backend
-    router.push('/(tabs)/ocorrencias');
+    router.push('./ocorrencias');
   };
 
   return (
@@ -59,7 +41,7 @@ export default function OcorrenciaFormScreen() {
       <Card style={styles.card}>
         <Card.Content>
           <Title style={{ marginBottom: 16 }}>
-            {id ? 'Editar Ocorrência' : 'Nova Ocorrência'}
+            {idParam ? 'Editar Ocorrência' : 'Nova Ocorrência'}
           </Title>
 
           <TextInput
@@ -69,7 +51,6 @@ export default function OcorrenciaFormScreen() {
             mode="outlined"
             style={styles.input}
           />
-
           <TextInput
             label="Bairro"
             value={bairro}
@@ -80,9 +61,7 @@ export default function OcorrenciaFormScreen() {
 
           <Title style={{ marginTop: 16, fontSize: 16 }}>Prioridade</Title>
           <RadioButton.Group
-            onValueChange={(value) =>
-              setPrioridade(value as 'Baixa' | 'Média' | 'Crítica')
-            }
+            onValueChange={(value) => setPrioridade(value as 'Baixa' | 'Média' | 'Crítica')}
             value={prioridade}
           >
             <View style={styles.radioRow}>
@@ -97,9 +76,7 @@ export default function OcorrenciaFormScreen() {
 
           <Title style={{ marginTop: 16, fontSize: 16 }}>Status</Title>
           <RadioButton.Group
-            onValueChange={(value) =>
-              setStatus(value as 'Ativa' | 'Encerrada')
-            }
+            onValueChange={(value) => setStatus(value as 'Ativa' | 'Encerrada')}
             value={status}
           >
             <View style={styles.radioRow}>
@@ -117,7 +94,7 @@ export default function OcorrenciaFormScreen() {
             style={[styles.button, { backgroundColor: theme.colors.primary }]}
             onPress={handleSalvar}
           >
-            {id ? 'Salvar Alterações' : 'Cadastrar Ocorrência'}
+            {idParam ? 'Salvar Alterações' : 'Cadastrar Ocorrência'}
           </Button>
         </Card.Content>
       </Card>
@@ -129,7 +106,7 @@ const styles = StyleSheet.create({
   container: { padding: 16 },
   card: { padding: 16 },
   input: { marginBottom: 12 },
-  button: { marginTop: 20 },
-  radioRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
+  radioRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   radioLabel: { marginRight: 16 },
+  button: { marginTop: 24 },
 });
