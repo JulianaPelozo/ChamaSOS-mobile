@@ -1,60 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Title, TextInput, Button, HelperText, RadioButton, useTheme } from 'react-native-paper';
+import {
+  Card,
+  Title,
+  TextInput,
+  Button,
+  HelperText,
+  RadioButton,
+  useTheme,
+} from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { api } from '../src/app';
 
 export default function NovaOcorrenciaScreen() {
   const theme = useTheme();
   const router = useRouter();
-
   const params = useLocalSearchParams<{ id?: string }>();
   const idParam = params.id;
 
+  // Estados dos campos
   const [tipo, setTipo] = useState('');
   const [bairro, setBairro] = useState('');
   const [prioridade, setPrioridade] = useState<'Baixa' | 'Média' | 'Crítica'>('Baixa');
   const [status, setStatus] = useState<'Ativa' | 'Encerrada'>('Ativa');
+  const [numVitimas, setNumVitimas] = useState(0);
+  const [custo, setCusto] = useState(0);
+  const [batalhao, setBatalhao] = useState('');
+  const [descricao, setDescricao] = useState('');
   const [erro, setErro] = useState('');
-  const [loading, setLoading] = useState(false);
 
+  // Se estiver editando, pré-preencher (pode buscar do backend depois)
   useEffect(() => {
     if (idParam) {
-      api.get(`/ocorrencias/${idParam}`)
-        .then(res => {
-          const o = res.data;
-          setTipo(o.tipo);
-          setBairro(o.bairro);
-          setPrioridade(o.prioridade);
-          setStatus(o.status);
-        })
-        .catch(() => setErro('Erro ao carregar ocorrência'));
+      setTipo('Incêndio');
+      setBairro('Boa Viagem');
+      setPrioridade('Crítica');
+      setStatus('Ativa');
+      setNumVitimas(2);
+      setCusto(1500);
+      setBatalhao('1º Grupamento - Santo Amaro');
+      setDescricao('Descrição exemplo da ocorrência.');
     }
   }, [idParam]);
 
-  const handleSalvar = async () => {
-    if (!tipo || !bairro) {
-      setErro('Preencha todos os campos');
+  const handleSalvar = () => {
+    if (!tipo || !bairro || !batalhao) {
+      setErro('Preencha todos os campos obrigatórios');
       return;
     }
-    setErro('');
-    setLoading(true);
 
-    try {
-      if (idParam) {
-        // Atualiza ocorrência
-        await api.put(`/ocorrencias/${idParam}`, { tipo, bairro, prioridade, status });
-      } else {
-        // Cria nova ocorrência
-        await api.post('/ocorrencias', { tipo, bairro, prioridade, status });
-      }
-      router.push('./ocorrencias');
-    } catch (err) {
-      console.error(err);
-      setErro('Erro ao salvar ocorrência');
-    } finally {
-      setLoading(false);
-    }
+    setErro('');
+    const ocorrenciaData = {
+      id: idParam,
+      tipo,
+      bairro,
+      prioridade,
+      status,
+      numVitimas,
+      custo,
+      batalhao,
+      descricao,
+    };
+
+    console.log('Salvando ocorrência', ocorrenciaData);
+
+    // Aqui você chamaria a API: POST (nova) ou PUT (editar)
+    // axios.post('/ocorrencias', ocorrenciaData)
+
+    router.push('./ocorrencias');
   };
 
   return (
@@ -72,12 +84,49 @@ export default function NovaOcorrenciaScreen() {
             mode="outlined"
             style={styles.input}
           />
+
           <TextInput
             label="Bairro"
             value={bairro}
             onChangeText={setBairro}
             mode="outlined"
             style={styles.input}
+          />
+
+          <TextInput
+            label="Número de Vítimas"
+            value={numVitimas.toString()}
+            onChangeText={(text) => setNumVitimas(Number(text))}
+            mode="outlined"
+            keyboardType="numeric"
+            style={styles.input}
+          />
+
+          <TextInput
+            label="Custo da Ocorrência (R$)"
+            value={custo.toString()}
+            onChangeText={(text) => setCusto(Number(text))}
+            mode="outlined"
+            keyboardType="numeric"
+            style={styles.input}
+          />
+
+          <TextInput
+            label="Batalhão Chamado"
+            value={batalhao}
+            onChangeText={setBatalhao}
+            mode="outlined"
+            style={styles.input}
+          />
+
+          <TextInput
+            label="Descrição"
+            value={descricao}
+            onChangeText={setDescricao}
+            mode="outlined"
+            multiline
+            numberOfLines={4}
+            style={[styles.input, { height: 100 }]}
           />
 
           <Title style={{ marginTop: 16, fontSize: 16 }}>Prioridade</Title>
@@ -114,8 +163,6 @@ export default function NovaOcorrenciaScreen() {
             mode="contained"
             style={[styles.button, { backgroundColor: theme.colors.primary }]}
             onPress={handleSalvar}
-            loading={loading}
-            disabled={loading}
           >
             {idParam ? 'Salvar Alterações' : 'Cadastrar Ocorrência'}
           </Button>
