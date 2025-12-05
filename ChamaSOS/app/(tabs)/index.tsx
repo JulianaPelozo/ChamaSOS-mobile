@@ -69,7 +69,7 @@ export default function DashboardScreen() {
           </Card.Content>
         </Card>
 
-        {/* Ações rápidas */}
+        
         <Card style={styles.quickActions}>
           <Card.Content>
             <Title>Ações Rápidas</Title>
