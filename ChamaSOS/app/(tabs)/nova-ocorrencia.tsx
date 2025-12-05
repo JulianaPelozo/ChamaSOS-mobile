@@ -2,38 +2,59 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Card, Title, TextInput, Button, HelperText, RadioButton, useTheme } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { api } from '../src/app';
 
 export default function NovaOcorrenciaScreen() {
   const theme = useTheme();
   const router = useRouter();
 
   const params = useLocalSearchParams<{ id?: string }>();
-  const idParam = params.id; 
+  const idParam = params.id;
 
   const [tipo, setTipo] = useState('');
   const [bairro, setBairro] = useState('');
   const [prioridade, setPrioridade] = useState<'Baixa' | 'Média' | 'Crítica'>('Baixa');
   const [status, setStatus] = useState<'Ativa' | 'Encerrada'>('Ativa');
   const [erro, setErro] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (idParam) {
-      setTipo('Incêndio');
-      setBairro('Boa Viagem');
-      setPrioridade('Crítica');
-      setStatus('Ativa');
+      api.get(`/ocorrencias/${idParam}`)
+        .then(res => {
+          const o = res.data;
+          setTipo(o.tipo);
+          setBairro(o.bairro);
+          setPrioridade(o.prioridade);
+          setStatus(o.status);
+        })
+        .catch(() => setErro('Erro ao carregar ocorrência'));
     }
   }, [idParam]);
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!tipo || !bairro) {
       setErro('Preencha todos os campos');
       return;
     }
     setErro('');
-    console.log('Salvando ocorrência', { id: idParam, tipo, bairro, prioridade, status });
+    setLoading(true);
 
-    router.push('./ocorrencias');
+    try {
+      if (idParam) {
+        // Atualiza ocorrência
+        await api.put(`/ocorrencias/${idParam}`, { tipo, bairro, prioridade, status });
+      } else {
+        // Cria nova ocorrência
+        await api.post('/ocorrencias', { tipo, bairro, prioridade, status });
+      }
+      router.push('./ocorrencias');
+    } catch (err) {
+      console.error(err);
+      setErro('Erro ao salvar ocorrência');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -93,6 +114,8 @@ export default function NovaOcorrenciaScreen() {
             mode="contained"
             style={[styles.button, { backgroundColor: theme.colors.primary }]}
             onPress={handleSalvar}
+            loading={loading}
+            disabled={loading}
           >
             {idParam ? 'Salvar Alterações' : 'Cadastrar Ocorrência'}
           </Button>
