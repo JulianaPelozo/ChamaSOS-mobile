@@ -1,7 +1,6 @@
-// src/api.ts
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // ou o IP da sua máquina se for em dispositivo físico
+  baseURL: 'http://192.168.0.187:3000/api', 
   timeout: 5000,
 });

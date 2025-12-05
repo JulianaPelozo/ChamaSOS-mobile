@@ -37,7 +37,6 @@ export default function OcorrenciasScreen() {
             <Paragraph>Horário: {oc.horario}</Paragraph>
           </Card.Content>
           <Card.Actions>
-            {/* Navegação relativa para edição */}
             <Button
               mode="outlined"
               onPress={() => router.push(`./nova-ocorrencia?id=${oc.id}`)}
