@@ -16,7 +16,7 @@ import {
   buscarOcorrencia,
   criarOcorrencia,
   atualizarOcorrencia,
-} from '../src/services/ocorrenciaService'; 
+} from '../../src/services/ocorrenciaService'; 
 
 const mapToFormState = (ocorrencia: Ocorrencia) => ({
     tipo: ocorrencia.tipo,

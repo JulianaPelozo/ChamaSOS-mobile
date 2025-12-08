@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { ScrollView, StyleSheet, RefreshControl } from 'react-native';
 import { Card, Title, Paragraph, Button, useTheme, ActivityIndicator } from 'react-native-paper';
 import { useRouter, useFocusEffect } from 'expo-router';
-import { Ocorrencia, listarOcorrencias, deletarOcorrencia } from '../src/services/ocorrenciaService';
+import { Ocorrencia, listarOcorrencias, deletarOcorrencia } from '../../src/services/ocorrenciaService';
 
 export default function OcorrenciasScreen() {
   const theme = useTheme();
